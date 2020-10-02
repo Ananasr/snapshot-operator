@@ -1,25 +1,32 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
 metadata:
   name: snapshot-operator
+  labels:
+    app: snapshot-operator
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      name: snapshot-operator
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - snapshot-operator
+        from:
+          kind: ImageStreamTag
+          name: snapshot-operator:latest
+      type: ImageChange
+    - type: ConfigChange
   template:
     metadata:
       labels:
-        name: snapshot-operator
+        app: snapshot-operator
     spec:
       containers:
         - name: snapshot-operator
-          image: REPLACE_IMAGE
+          image: snapshot-operator:latest
           ports:
           - containerPort: 60000
             name: metrics
-          command:
-          - snapshot-operator
           imagePullPolicy: Always
           env:
             - name: WATCH_NAMESPACE

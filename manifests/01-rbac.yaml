@@ -69,7 +69,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: default
-  namespace: default
+  namespace: snapshot
 roleRef:
   kind: ClusterRole
   name: snapshot-operator

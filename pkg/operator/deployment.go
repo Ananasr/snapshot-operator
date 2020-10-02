@@ -90,10 +90,12 @@ func newSnapshotControllerDeployment(cr *v1alpha1.SnapshotController, cfg Config
 	}
 	// Add cloudprovider commandline flag
 	if cfg.cloudProvider != "" {
-		for _, container := range dep.Spec.Template.Spec.Containers {
+		for index, _ := range dep.Spec.Template.Spec.Containers {
+			container := &dep.Spec.Template.Spec.Containers[index]
 			container.Args = []string{"-cloudprovider", cfg.cloudProvider}
 		}
 	}
+
 	// Need a secret with credentials for AWS
 	if cfg.cloudProvider == "aws" {
 		if cfg.awsSecret != "" {
@@ -105,7 +107,8 @@ func newSnapshotControllerDeployment(cr *v1alpha1.SnapshotController, cfg Config
 					return nil
 				}
 			}
-			for _, container := range dep.Spec.Template.Spec.Containers {
+			for index, _ := range dep.Spec.Template.Spec.Containers {
+				container := &dep.Spec.Template.Spec.Containers[index]
 				container.Env = []corev1.EnvVar{
 					{
 						Name: "AWS_ACCESS_KEY_ID",
@@ -132,6 +135,7 @@ func newSnapshotControllerDeployment(cr *v1alpha1.SnapshotController, cfg Config
 		}
 
 	}
+
 	addOwnerRef(dep, ownerRefFrom(cr))
 
 	return dep
